@@ -721,8 +721,10 @@ void Plane::set_servos_flaps(void)
     SRV_Channels::set_slew_rate(SRV_Channel::k_flap_auto, g.flap_slewrate, 100, G_Dt);
     SRV_Channels::set_slew_rate(SRV_Channel::k_flap, g.flap_slewrate, 100, G_Dt);
 
-    // output to flaperons, if any
-    flaperon_update();
+    if (plane.get_mode() != Mode::EXTERNAL)  {
+        // output to flaperons, if any
+        flaperon_update();
+    }
 }
 
 /*
@@ -853,8 +855,10 @@ void Plane::set_servos(void)
         // allow landing to override servos if it would like to
         landing.override_servos();
     }
-
-    set_throttle();
+    
+    if (plane.get_mode() != Mode::EXTERNAL)  {
+        set_throttle();
+    }
 
     if ((control_mode != &mode_manual) && !arming.is_armed_and_safety_off()) {
         // Always set 0 scaled even if overriding to zero pwm.
