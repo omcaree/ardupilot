@@ -62,6 +62,7 @@ public:
 #if HAL_QUADPLANE_ENABLED
         LOITER_ALT_QLAND = 25,
 #endif
+		EXTERNAL = 27
     };
 
     // Constructor
@@ -911,3 +912,52 @@ protected:
 };
 
 #endif
+class ModeExt : public Mode {
+
+public:
+    using Mode::Mode;
+    Number mode_number() const override { return Number::EXTERNAL; }
+
+    const char *name() const override { return "EXTERNAL"; }
+    const char *name4() const override { return "EXT"; }
+    void run() override;
+	void update() override {};
+    bool does_auto_throttle() const override { return true; }
+
+protected:
+
+    enum ExtState {WAIT_FOR_RESPONSE=0, READY_FOR_REQUEST=1};
+    enum Outputs {THROTTLE=0, PORT_AILERON=1, STBD_AILERON=2, ELEVATOR=3, RUDDER=4};
+
+    constexpr static uint32_t CLOCK_PERIOD = 20000;
+    constexpr static uint32_t TIMEOUT = 10 * CLOCK_PERIOD;
+    constexpr static Mode::Number TIMEOUT_MODE = Mode::Number::STABILIZE;
+    constexpr static ModeReason TIMEOUT_MODE_REASON = ModeReason::RC_COMMAND;
+
+    AP_HAL::UARTDriver *_uart;
+    ExtState _companion_state;
+    uint32_t _cycle_start_time;
+    float _outputs[5];
+
+    bool _enter() override;
+    void _reset_ext() const;
+    bool _send_data_to_ext();
+    bool _data_available() const;
+    void _receive_from_ext();
+
+    void _send_byte(const uint8_t v) const;
+    void _send_uint32(const uint32_t v) const;
+    void _send_float(const float v) const;
+    void _send_vector(const Vector3f v) const;
+    void _send_quaternion(const Quaternion q) const;
+    uint8_t _receive_uint8() const;
+    uint16_t _receive_uint16() const;
+    float _receive_float() const;
+    void _zero_output();
+    void _set_mode_stabilize();
+    void _output();
+
+private:
+
+};
+

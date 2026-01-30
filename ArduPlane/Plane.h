@@ -173,6 +173,7 @@ public:
     friend class ModeTakeoff;
     friend class ModeThermal;
     friend class ModeLoiterAltQLand;
+	friend class ModeExt;
 
 #if AP_EXTERNAL_CONTROL_ENABLED
     friend class AP_ExternalControl_Plane;
@@ -338,6 +339,7 @@ private:
 #if AP_QUICKTUNE_ENABLED
     AP_Quicktune quicktune;
 #endif
+	ModeExt mode_ext;
     
     // This is the state of the flight control system
     // There are multiple states defined such as MANUAL, FBW-A, AUTO

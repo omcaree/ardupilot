@@ -582,6 +582,9 @@ public:
 
     // just to make compilation easier when all things are compiled out...
     uint8_t unused_integer;
+    AP_Int32        ext_unsafe;
+    AP_Int32        ext_soton;
+
 
 #if AP_RANGEFINDER_ENABLED
     // orientation of rangefinder to use for landing
