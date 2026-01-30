@@ -170,7 +170,7 @@ bool ModeExt::_send_data_to_ext() {
 
     // send to act command to companion computer
     _send_byte('a');
-    _send_uint32(AP_HAL::millis());
+    _send_uint32(AP_HAL::micros());
     _send_vector(velocity);
     _send_vector(acceleration);
     _send_quaternion(quaternion);
