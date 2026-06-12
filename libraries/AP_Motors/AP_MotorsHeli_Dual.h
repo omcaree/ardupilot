@@ -44,6 +44,14 @@ public:
     // output_to_motors - sends values out to the motors
     void output_to_motors() override;
 
+    void output_external(float throttle, \
+        float port_col, \
+        float port_lat, \
+        float port_lon, \
+        float stbd_col, \
+        float stbd_lat, \
+        float stbd_lon);
+
     // calculate_scalars - recalculates various scalars used
     void calculate_scalars() override;
 

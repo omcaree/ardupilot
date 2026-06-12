@@ -100,6 +100,7 @@ public:
         AUTOROTATE =   26,  // Autonomous autorotation
         AUTO_RTL =     27,  // Auto RTL, this is not a true mode, AUTO will report as this mode if entered to perform a DO_LAND_START Landing sequence
         TURTLE =       28,  // Flip over after crash
+        EXTERNAL =     29,
 
         // Mode number 127 reserved for the "drone show mode" in the Skybrush
         // fork at https://github.com/skybrush-io/ardupilot
@@ -2051,3 +2052,62 @@ private:
 
 };
 #endif
+class ModeExt : public Mode {
+
+public:
+    using Mode::Mode;
+    Number mode_number() const override { return Number::EXTERNAL; }
+
+    const char *name() const override { return "EXTERNAL"; }
+    const char *name4() const override { return "EXT"; }
+    bool init(bool ignore_checks) override;
+    void run() override;
+    bool requires_GPS() const override { return false; }
+    bool has_manual_throttle() const override { return false; }
+    bool allows_arming(AP_Arming::Method method) const override { return false; };
+    void output_to_motors() override;
+ //   bool does_auto_throttle() const override { return true; }
+
+protected:
+
+    enum ExtState {WAIT_FOR_RESPONSE=0, READY_FOR_REQUEST=1};
+    enum Outputs {THROTTLE=0, PORT_AILERON=1, STBD_AILERON=2, ELEVATOR=3,\
+    PORT_COLLECTIVE=4, PORT_LATERAL_CYCLIC=5, PORT_LONGITUDINAL_CYCLIC=6, PORT_TILT=7, \
+    STBD_COLLECTIVE=8, STBD_LATERAL_CYCLIC=9, STBD_LONGITUDINAL_CYCLIC=10, STBD_TILT=11};
+
+    constexpr static uint32_t CLOCK_PERIOD = 20000;
+    constexpr static uint32_t TIMEOUT = 10 * CLOCK_PERIOD;
+    constexpr static Mode::Number TIMEOUT_MODE = Mode::Number::STABILIZE;
+    constexpr static ModeReason TIMEOUT_MODE_REASON = ModeReason::RC_COMMAND;
+
+    uint8_t port_ail_ch = 10;
+    uint8_t stbd_ail_ch = 11;
+    uint8_t ele_ch = 12;
+    uint8_t port_tilt_ch = 8;
+    uint8_t stbd_tilt_ch = 9;
+
+    AP_HAL::UARTDriver *_uart;
+    ExtState _companion_state;
+    uint32_t _cycle_start_time;
+    AP_MotorsHeli_Dual * ext_motors = (AP_MotorsHeli_Dual*)(motors);
+    float _outputs[12];
+        
+    void _reset_ext() const;
+    bool _send_data_to_ext();
+    bool _data_available() const;
+    void _receive_from_ext();
+
+    void _send_byte(const uint8_t v) const;
+    void _send_uint32(const uint32_t v) const;
+    void _send_float(const float v) const;
+    void _send_vector(const Vector3f v) const;
+    void _send_quaternion(const Quaternion q) const;
+    uint8_t _receive_uint8() const;
+    uint16_t _receive_uint16() const;
+    float _receive_float() const;
+    void _zero_output();
+    void _set_mode_stabilize();
+
+private:
+
+};

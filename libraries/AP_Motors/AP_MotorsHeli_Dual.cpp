@@ -332,6 +332,18 @@ void AP_MotorsHeli_Dual::mix_transverse(float pitch_input, float roll_input, flo
     _swashplate2.calculate(swash_roll, swash2_pitch, swash2_coll);
 }
 
+void AP_MotorsHeli_Dual::output_external(float throttle, \
+        float port_col, \
+        float port_lat, \
+        float port_lon, \
+        float stbd_col, \
+        float stbd_lat, \
+        float stbd_lon) {
+            _swashplate1.calculate(port_lat, port_lon, port_col);
+            _swashplate2.calculate(stbd_lat, stbd_lon, stbd_col);
+            set_throttle(throttle);
+        }
+
 // Mix and output swashplates for intermeshing
 void AP_MotorsHeli_Dual::mix_intermeshing(float pitch_input, float roll_input, float yaw_input, float collective1_input, float collective2_input)
 {
